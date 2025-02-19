@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Counters</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f4f4f4;
+        }
+        .counters-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .counter-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Daily Counters</h1>
+    <p>Last Updated: <span id="globalLastUpdated"></span></p>
+    <div class="counters-container">
+        <div class="counter-container">
+            <h2>Counter 1</h2>
+            <p>Count: <span id="count1"></span></p>
+        </div>
+        <div class="counter-container">
+            <h2>Counter 2</h2>
+            <p>Count: <span id="count2"></span></p>
+        </div>
+        <div class="counter-container">
+            <h2>Counter 3</h2>
+            <p>Count: <span id="count3"></span></p>
+        </div>
+    </div>
+
+    <script>
+        let counters = [
+            { id: "count1", N: 5, Y: 2, initialValue: 10000, startTimestamp: "2025-02-19-14-00-00" },
+            { id: "count2", N: 10, Y: 3, initialValue: 5000, startTimestamp: "2025-02-19-14-00-00" },
+            { id: "count3", N: 2, Y: 1, initialValue: 20000, startTimestamp: "2025-02-19-14-00-00" }
+        ];
+
+        function parseTimestamp(timestamp) {
+            let parts = timestamp.split("-").map(Number);
+            return new Date(parts[0], parts[1] - 1, parts[2], parts[3], parts[4], parts[5]);
+        }
+
+        function getCurrentTimestamp() {
+            return new Date();
+        }
+
+        function calculateInitialValue(counter) {
+            let startTime = parseTimestamp(counter.startTimestamp);
+            let now = getCurrentTimestamp();
+            let elapsedSeconds = Math.floor((now.getTime() - startTime.getTime()) / 1000);
+            let increments = Math.floor(elapsedSeconds / counter.Y);
+            return counter.initialValue + (increments * counter.N);
+        }
+
+        function updateCounter(counter) {
+            let countElement = document.getElementById(counter.id);
+            let count = parseInt(countElement.innerText, 10) + counter.N;
+            countElement.innerText = count;
+        }
+
+        function initializeCounter(counter) {
+            const count = calculateInitialValue(counter);
+            document.getElementById(counter.id).innerText = count;
+            setInterval(() => updateCounter(counter), counter.Y * 1000);
+        }
+
+        function updateGlobalLastUpdated() {
+            let now = new Date();
+            let formattedDate = now.getDate().toString().padStart(2, '0') + '/' + (now.getMonth() + 1).toString().padStart(2, '0') + '/' + now.getFullYear();
+            document.getElementById("globalLastUpdated").innerText = formattedDate;
+        }
+
+        counters.forEach(initializeCounter);
+        updateGlobalLastUpdated();
+    </script>
+</body>
+</html>
